@@ -60,7 +60,7 @@ router.post("/query", async (req, res) => {
 
 
         const stream = await claude.messages.stream({
-            model: "claude-sonnet-4-5-20251001",
+            model: "claude-sonnet-4-5-20250929",
             max_tokens: 8192,
             system: buildSystemPrompt(articles),
             messages: [{ role: "user", content: question }],
@@ -79,6 +79,10 @@ router.post("/query", async (req, res) => {
         console.error("Error:", err.message);
         if (!res.headersSent) {
             res.status(500).json({ error: err.message });
+        } else {
+            res.write(`data: ${JSON.stringify({ type: "text", text: `\n\n[Server Error: ${err.message}]` })}\n\n`);
+            res.write(`data: ${JSON.stringify({ type: "done" })}\n\n`);
+            res.end();
         }
     }
 });
