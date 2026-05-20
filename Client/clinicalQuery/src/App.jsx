@@ -356,7 +356,7 @@ export default function ClinicalQuery() {
               value={question}
               onChange={e => setQuestion(e.target.value)}
               onKeyDown={handleKeyDown}
-              placeholder="Ask a clinical question... (Enter to search)"
+              placeholder="Enter a clinical question..."
               rows={2}
               disabled={isActive}
               style={{
