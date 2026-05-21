@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 
-const BACKEND = "http://localhost:5000";
+const BACKEND = "summer-production-f51d.up.railway.app";
 
 const EXAMPLE_QUESTIONS = [
   "What are second-line treatments for HER2+ breast cancer?",
