@@ -7,15 +7,7 @@ const cors = require("cors");
 const queryRoutes = require("./routes/query");
 const app = express();
 
-
-app.use(cors({
-    origin: [
-        "http://localhost:5173",
-        "https://summer-my6c.vercel.app",
-        "https://summer-my6c-git-master-leorf1s-projects.vercel.app",
-        "https://summer-my6c-hbexurtpj-leorf1s-projects.vercel.app"
-    ]
-}));
+app.use(cors());
 app.use(express.json());
 app.use('/api', queryRoutes);
 
