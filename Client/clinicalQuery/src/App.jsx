@@ -226,9 +226,7 @@ export default function ClinicalQuery() {
         }
       }
     } catch (err) {
-      setErrorMsg(err.message.includes("fetch")
-        ? "Cannot reach backend. Make sure the server is running on port 3001."
-        : err.message);
+      setErrorMsg(err.message);
       setPhase("error");
     }
   }
