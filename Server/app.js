@@ -8,7 +8,12 @@ const queryRoutes = require("./routes/query");
 const app = express();
 
 
-app.use(cors());
+app.use(cors({
+    origin: [
+        "http://localhost:5173",
+        "https://summer-my6c-49hugd8da-leorf1s-projects.vercel.app/"
+    ]
+}));
 app.use(express.json());
 app.use('/api', queryRoutes);
 
