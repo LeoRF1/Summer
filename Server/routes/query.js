@@ -2,8 +2,10 @@ const express = require("express");
 const router = express.Router();
 const { searchPubMed, fetchAbstracts } = require("../services/pubmedService");
 const Anthropic = require("@anthropic-ai/sdk");
+const { logQuery } = require("../services/db");
 
 const buildSystemPrompt = (articles) => {
+    // Format each article abstract as an indexed context reference [1], [2], etc.
     const context = articles.map((a, i) =>
         `[${i + 1}] PMID:${a.pmid} (${a.year}) — ${a.title}\n${a.journal}\n${a.abstract}`
     ).join("\n\n---\n\n");
@@ -22,11 +24,21 @@ ABSTRACTS:
 ${context}`;
 };
 
+// Initialize the Anthropic client using the ANTHROPIC_API_KEY from environment variables
 const claude = new Anthropic({
     apiKey: process.env.ANTHROPIC_API_KEY,
 });
 
 
+/**
+ * POST /api/query
+ * 
+ * Handles incoming clinical questions. It:
+ * 1. Queries the PubMed API for relevant article IDs.
+ * 2. Fetches medical abstracts for those IDs.
+ * 3. Returns article metadata and streams Claude's grounded synthesis back using Server-Sent Events (SSE).
+ * 4. Automatically logs the question and completed answer to the PostgreSQL database.
+ */
 router.post("/query", async (req, res) => {
     const { question } = req.body;
     if (!question?.trim()) {
@@ -66,11 +78,18 @@ router.post("/query", async (req, res) => {
             messages: [{ role: "user", content: question }],
         });
 
+        // this is a variable that will store the full answer
+        let fullAnswer = "";
+
         for await (const chunk of stream) {
             if (chunk.type === "content_block_delta" && chunk.delta.type === "text_delta") {
-                res.write(`data: ${JSON.stringify({ type: "text", text: chunk.delta.text })}\n\n`);
+                const textChunk = chunk.delta.text;
+                fullAnswer += textChunk;
+                res.write(`data: ${JSON.stringify({ type: "text", text: textChunk })}\n\n`);
             }
         }
+
+        await logQuery(question, fullAnswer, articles.length);
 
         res.write(`data: ${JSON.stringify({ type: "done" })}\n\n`);
         res.end();
