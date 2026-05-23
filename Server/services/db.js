@@ -1,5 +1,5 @@
-const { prismaClient } = require('@prisma/client');
-const prisma = new prismaClient();
+const { PrismaClient } = require('@prisma/client');
+const prisma = new PrismaClient();
 
 
 // this function logs the query to the database
