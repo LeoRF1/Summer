@@ -19,4 +19,3 @@ model Query {
   date         DateTime @default(now())
   articleCount Int
 }
-

@@ -14,11 +14,11 @@
   "license": "ISC",
   "dependencies": {
     "@anthropic-ai/sdk": "^0.96.0",
-    "@prisma/client": "^7.8.0",
+    "@prisma/client": "^5.22.0",
     "axios": "^1.16.1",
     "cors": "^2.8.6",
     "dotenv": "^17.4.2",
     "express": "^5.2.1",
-    "prisma": "^7.8.0"
+    "prisma": "^5.22.0"
   }
 }
