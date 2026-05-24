@@ -341,7 +341,7 @@ export default function ClinicalQuery() {
             fontSize: 16,
             color: "var(--text-primary)",
           }}>
-            Recent {showHistory ? "▲" : "▼"}
+            Chats {showHistory ? "▲" : "▼"}
           </button>
         )}
       </header>
