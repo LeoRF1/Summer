@@ -2,7 +2,7 @@ const express = require("express");
 const router = express.Router();
 const { searchPubMed, fetchAbstracts } = require("../services/pubmedService");
 const Anthropic = require("@anthropic-ai/sdk");
-const { logQuery } = require("../services/db");
+const { logQuery, getRecentQueries } = require("../services/db");
 
 const buildSystemPrompt = (articles) => {
     // Format each article abstract as an indexed context reference [1], [2], etc.
@@ -105,6 +105,12 @@ router.post("/query", async (req, res) => {
         }
     }
 });
+
+
+router.get('/logs', async (req, res) => {
+    const logs = await getRecentQueries();
+    res.json(logs);
+})
 
 
 module.exports = router;
