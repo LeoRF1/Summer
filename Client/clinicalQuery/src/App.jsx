@@ -72,7 +72,14 @@ function ArticleCard({ article, index }) {
 }
 
 function AnswerBlock({ text, streaming }) {
+  const [copied, setCopied] = useState(false);
   const paragraphs = text.split("\n\n").filter(Boolean);
+
+  function copyToClipboard() {
+    navigator.clipboard.writeText(text);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  }
   return (
     <div style={{ lineHeight: 1.8, color: "var(--text-primary)", fontSize: 14 }}>
       {paragraphs.map((para, i) => (
@@ -96,6 +103,19 @@ function AnswerBlock({ text, streaming }) {
           verticalAlign: "middle",
           marginLeft: 2,
         }} />
+      )}
+
+      {!streaming && (
+        <button onClick={copyToClipboard} style={{
+          background: "var(--accent)",
+          color: "#fff",
+          borderRadius: 4,
+          padding: "2px 7px",
+          fontSize: 11,
+          fontWeight: 700,
+          flexShrink: 0,
+          fontFamily: "var(--mono)",
+        }}> {copied ? "Copied!" : "Copy Answer"} </button>
       )}
     </div>
   );
