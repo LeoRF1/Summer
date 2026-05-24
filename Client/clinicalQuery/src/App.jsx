@@ -124,17 +124,27 @@ function AnswerBlock({ text, streaming }) {
 export default function ClinicalQuery() {
   const [question, setQuestion] = useState("");
   const [theme, setTheme] = useState("light");
-  const [phase, setPhase] = useState("idle"); // idle | searching | streaming | done | error
+  const [phase, setPhase] = useState("idle");
   const [articles, setArticles] = useState([]);
   const [answer, setAnswer] = useState("");
   const [errorMsg, setErrorMsg] = useState("");
   const [history, setHistory] = useState([]);
   const answerRef = useRef("");
   const textareaRef = useRef(null);
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+  const [showHistory, setShowHistory] = useState(false);
 
   useEffect(() => {
     document.documentElement.setAttribute("data-theme", theme);
   }, [theme]);
+
+
+  useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth < 768);
+    window.addEventListener("resize", handleResize);
+
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
 
   useEffect(() => {
@@ -293,7 +303,9 @@ export default function ClinicalQuery() {
           fontWeight: 600,
         }}>PubMed + Claude</span>
         <div style={{ flex: 1 }} />
-        <span style={{ fontSize: 11, color: "var(--text-muted)" }}>Powered by Anthropic API · For research use only</span>
+        {!isMobile && (
+          <span style={{ fontSize: 11, color: "var(--text-muted)" }}>Powered by Anthropic API · For research use only</span>
+        )}
 
         <button
           onClick={() => setTheme(t => t === "light" ? "dark" : "light")}
@@ -315,12 +327,64 @@ export default function ClinicalQuery() {
           {theme === "light" ? "🌙" : "☀️"}
         </button>
 
+        {isMobile && history.length > 0 && (
+          <button onClick={() => setShowHistory(h => !h)} style={{
+            background: "none",
+            border: "1px solid var(--border)",
+            borderRadius: 6,
+            width: 32,
+            height: 32,
+            cursor: "pointer",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            fontSize: 16,
+            color: "var(--text-primary)",
+          }}>
+            Recent {showHistory ? "▲" : "▼"}
+          </button>
+        )}
       </header>
+
+      {isMobile && showHistory && history.length > 0 && (
+        <div style={{
+          background: "var(--surface)",
+          borderBottom: "1px solid var(--border)",
+          padding: "8px 16px",
+        }}>
+          {history.map((h, i) => (
+            <button
+              key={i}
+              onClick={() => {
+                setQuestion(h.question);
+                setAnswer(h.answer);
+                setArticles(h.articles);
+                setPhase("done");
+                setShowHistory(false);
+              }}
+              style={{
+                display: "block",
+                width: "100%",
+                textAlign: "left",
+                background: "none",
+                border: "none",
+                padding: "8px 0",
+                borderBottom: "1px solid var(--border)",
+                fontSize: 13,
+                color: "var(--text-secondary)",
+                cursor: "pointer",
+              }}
+            >
+              {h.question.length > 60 ? h.question.slice(0, 60) + "…" : h.question}
+            </button>
+          ))}
+        </div>
+      )}
 
       <div style={{ flex: 1, display: "flex", maxWidth: 960, margin: "0 auto", width: "100%", padding: "0 16px" }}>
 
         {/* Sidebar — query history */}
-        {history.length > 0 && (
+        {history.length > 0 && !isMobile && (
           <aside style={{
             width: 200,
             flexShrink: 0,
@@ -387,28 +451,31 @@ export default function ClinicalQuery() {
                 lineHeight: 1.5,
               }}
             />
+
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 10 }}>
-              <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
-                {EXAMPLE_QUESTIONS.map((q, i) => (
-                  <button
-                    key={i}
-                    onClick={() => { setQuestion(q); runQuery(q); }}
-                    disabled={isActive}
-                    style={{
-                      background: "var(--surface2)",
-                      border: "1px solid var(--border)",
-                      borderRadius: 20,
-                      padding: "3px 10px",
-                      fontSize: 11,
-                      color: "var(--text-secondary)",
-                      cursor: "pointer",
-                      fontFamily: "var(--sans)",
-                    }}
-                  >
-                    {q.length > 36 ? q.slice(0, 36) + "…" : q}
-                  </button>
-                ))}
-              </div>
+              {!isMobile && (
+                <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
+                  {EXAMPLE_QUESTIONS.map((q, i) => (
+                    <button
+                      key={i}
+                      onClick={() => { setQuestion(q); runQuery(q); }}
+                      disabled={isActive}
+                      style={{
+                        background: "var(--surface2)",
+                        border: "1px solid var(--border)",
+                        borderRadius: 20,
+                        padding: "3px 10px",
+                        fontSize: 11,
+                        color: "var(--text-secondary)",
+                        cursor: "pointer",
+                        fontFamily: "var(--sans)",
+                      }}
+                    >
+                      {q.length > 36 ? q.slice(0, 36) + "…" : q}
+                    </button>
+                  ))}
+                </div>
+              )}
               <button
                 onClick={() => runQuery(question)}
                 disabled={isActive || !question.trim()}
