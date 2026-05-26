@@ -10,7 +10,7 @@ Summer is a comprehensive solution designed to handle clinical queries with inte
 
 - **Backend:** Express.js with Node.js
 - **Frontend:** React with Vite
-- **Database:** SQLite with Prisma ORM
+- **Database:** PostgreSQL with Prisma ORM
 - **AI Integration:** Anthropic Claude API
 - **Language:** 98.8% JavaScript, 1.2% HTML
 
@@ -119,8 +119,7 @@ npm run preview    # Preview production build
 ### Server
 - **Express.js** - Web framework
 - **Prisma** - Database ORM
-- **SQLite** - Database
-- **better-sqlite3** - SQLite driver
+- **postgresql** - Database
 - **Anthropic SDK** - AI integration
 - **Axios** - HTTP client
 - **CORS** - Cross-origin resource sharing
@@ -155,7 +154,7 @@ This project integrates with the **Anthropic Claude API** for intelligent clinic
 
 ## 🗄️ Database
 
-The project uses **SQLite** with **Prisma** as the ORM. Database initialization happens automatically on server startup through the `postinstall` script.
+The project uses **Postgresql** with **Prisma** as the ORM. Database initialization happens automatically on server startup through the `postinstall` script.
 
 ## 📝 Scripts
 
